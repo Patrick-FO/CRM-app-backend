@@ -1,0 +1,32 @@
+#version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:latest
+    container_name: crm-postgres
+    environment:
+      POSTGRES_USER: patrick
+      POSTGRES_PASSWORD: qwerty
+      POSTGRES_DB: crm_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Uncomment and adjust path if you want to initialize with SQL scripts
+      # - ./init-scripts:/docker-entrypoint-initdb.d
+
+  # Optionally add pgAdmin
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: crm-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: patrick.olausson@umain.com
+      PGADMIN_DEFAULT_PASSWORD: qwerty
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
