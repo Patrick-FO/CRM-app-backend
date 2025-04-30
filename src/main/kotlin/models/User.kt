@@ -1,4 +1,4 @@
-package com.example.crm.models.classes
+package com.example.crm.models
 
 import java.util.*
 

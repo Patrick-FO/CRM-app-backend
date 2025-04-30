@@ -1,4 +1,4 @@
-package com.example.crm.com.example.routing.request
+package com.example.crm.routing.request
 
 import kotlinx.serialization.Serializable
 

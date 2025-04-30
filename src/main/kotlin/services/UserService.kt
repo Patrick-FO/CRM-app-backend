@@ -1,11 +1,11 @@
 package com.example.crm.services
 
-import com.example.crm.models.classes.User
-import com.example.crm.repository.UserRepository
+import com.example.crm.models.User
+import com.example.crm.data.UserRepositoryImpl
 import java.util.*
 
 class UserService(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepositoryImpl
 ) {
     fun findAll(): List<User> =
         userRepository.findAll()

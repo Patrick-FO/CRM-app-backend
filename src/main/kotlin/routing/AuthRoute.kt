@@ -1,9 +1,8 @@
 package com.example.crm.routing
 
-import com.example.crm.com.example.routing.request.LoginRequest
+import com.example.crm.routing.request.LoginRequest
 import com.example.crm.services.JwtService
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*

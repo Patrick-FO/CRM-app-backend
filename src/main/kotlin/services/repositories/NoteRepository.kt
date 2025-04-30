@@ -1,6 +1,6 @@
-package com.example.crm.models.repositories
+package com.example.crm.services.repositories
 
-import com.example.crm.models.classes.Note
+import com.example.crm.models.Note
 
 /**
  * Interface for note data operations

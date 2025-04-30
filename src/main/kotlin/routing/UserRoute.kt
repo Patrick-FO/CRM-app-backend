@@ -1,9 +1,9 @@
 package com.example.crm.routing
 
-import com.example.crm.models.classes.User
+import com.example.crm.models.User
 import com.example.crm.routing.request.UserRequest
+import com.example.crm.routing.response.UserResponse
 import com.example.crm.services.UserService
-import com.example.crm.utils.UUIDSerializer
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -11,7 +11,6 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
 import java.util.*
 
 fun Route.userRoute(userService: UserService) {
@@ -59,13 +58,6 @@ fun extractPrincipalUsername(call: ApplicationCall): String? =
         ?.payload
         ?.getClaim("username")
         ?.asString()
-
-@Serializable
-data class UserResponse(
-    @Serializable(with = UUIDSerializer::class)
-    val id: UUID,
-    val username: String
-)
 
 fun User.toResponse(): UserResponse =
     UserResponse(

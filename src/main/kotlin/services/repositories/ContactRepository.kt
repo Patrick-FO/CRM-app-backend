@@ -1,6 +1,6 @@
-package com.example.crm.models.repositories
+package com.example.crm.services.repositories
 
-import com.example.crm.models.classes.Contact
+import com.example.crm.models.Contact
 
 /**
  * Interface for contact data operations

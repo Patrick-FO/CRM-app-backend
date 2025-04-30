@@ -1,6 +1,6 @@
 package com.example.crm.routing
 
-import com.example.crm.models.classes.User
+import com.example.crm.models.User
 import com.example.crm.services.JwtService
 import com.example.crm.services.UserService
 import io.ktor.http.*
