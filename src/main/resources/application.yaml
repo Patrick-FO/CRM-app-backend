@@ -1,6 +1,13 @@
 ktor:
   application:
     modules:
-      - com.example.crm-backend.ApplicationKt.module
+      - "com.example.crm.ApplicationKt.module"
   deployment:
     port: 8080
+
+
+jwt:
+  audience: "my-audience"
+  issuer: "http://localhost"
+  realm: "my realm"
+  secret: SECRET

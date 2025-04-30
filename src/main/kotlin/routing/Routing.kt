@@ -1,19 +1,50 @@
 package com.example.crm.routing
 
+import com.example.crm.models.classes.User
+import com.example.crm.services.JwtService
+import com.example.crm.services.UserService
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Application.configureRouting() {
+fun Application.configureRouting(
+    userService: UserService,
+    jwtService: JwtService
+) {
     val currentUser = "current-user"
     routing {
-        post("/login") {
-
+        route("/api/auth") {
+            authRoute(jwtService)
         }
 
-        post("/register") {
+        route("/api/user") {
+            userRoute(userService)
+        }
 
+        authenticate {
+            get {
+                val users = userService.findAll()
+
+                call.respond(message = users.map(User::toResponse))
+            }
+        }
+
+        authenticate("another-auth") {
+            get("/{id}") {
+                val id: String = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+
+                val foundUser = userService.findById(id) ?: return@get call.respond(HttpStatusCode.NotFound)
+
+
+                if(foundUser.username != extractPrincipalUsername(call))
+                    return@get call.respond(HttpStatusCode.NotFound)
+
+                call.respond(
+                    message = foundUser.toResponse()
+                )
+            }
         }
 
         authenticate {

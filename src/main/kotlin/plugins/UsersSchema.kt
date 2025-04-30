@@ -1,7 +1,5 @@
-package com.example.crm
-
--backend
-
+package com.example.crm.plugins
+/*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
@@ -62,3 +60,4 @@ class UserService(database: Database) {
         newSuspendedTransaction(Dispatchers.IO) { block() }
 }
 
+*/
