@@ -34,9 +34,7 @@ fun Route.userRoute(userService: UserService) {
 
             call.respond(message = users.map { it.toResponse() })
         }
-    }
 
-    authenticate("another-auth") {
         get("/{id}") {
             val id: String = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.BadRequest)
 

@@ -29,9 +29,7 @@ fun Application.configureRouting(
 
                 call.respond(message = users.map(User::toResponse))
             }
-        }
 
-        authenticate("another-auth") {
             get("/{id}") {
                 val id: String = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.BadRequest)
 
@@ -55,17 +53,17 @@ fun Application.configureRouting(
                     //TODO fetch all the contacts to view in a list later
                 }
 
+                post("/contacts") {
+                    val userId = call.parameters["userId"]
+
+                    //TODO create a contact
+                }
+
                 get("/contacts/{contactId}") {
                     val userId = call.parameters["userId"]
                     val contactId = call.parameters["contactId"]
 
                     //TODO select one contact
-                }
-
-                post("/contacts") {
-                    val userId = call.parameters["userId"]
-
-                    //TODO create a contact
                 }
 
                 get("/contacts/{contactId}/notes") {

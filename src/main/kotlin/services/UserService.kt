@@ -7,18 +7,18 @@ import java.util.*
 class UserService(
     private val userRepository: UserRepositoryImpl
 ) {
-    fun findAll(): List<User> =
+    suspend fun findAll(): List<User> =
         userRepository.findAll()
 
-    fun findById(id: String): User? =
+    suspend fun findById(id: String): User? =
         userRepository.findById(
             id = UUID.fromString(id)
         )
 
-    fun findByUsername(username: String): User? =
+    suspend fun findByUsername(username: String): User? =
         userRepository.findByUsername(username)
 
-    fun save(user: User): User? {
+    suspend fun save(user: User): User? {
         val foundUser = findByUsername(user.username)
         return if (foundUser != null) {
             null

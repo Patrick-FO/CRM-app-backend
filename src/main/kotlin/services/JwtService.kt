@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.example.crm.routing.request.LoginRequest
 import io.ktor.server.application.*
 import io.ktor.server.auth.jwt.*
+import kotlinx.coroutines.coroutineScope
 import java.util.*
 
 class JwtService(
@@ -24,7 +25,7 @@ class JwtService(
             .withIssuer(issuer)
             .build()
 
-    fun createJwtToken(loginRequest: LoginRequest): String? {
+    suspend fun createJwtToken(loginRequest: LoginRequest): String? {
         val foundUser = userService.findByUsername(loginRequest.username)
 
         return if(foundUser != null && foundUser.password == loginRequest.password) {
