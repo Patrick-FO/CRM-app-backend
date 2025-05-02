@@ -1,17 +1,15 @@
 package com.example.crm.services.repositories
 
 import com.example.crm.models.Contact
+import java.util.UUID
 
-/**
- * Interface for contact data operations
- */
 interface ContactRepository {
-    suspend fun findByUserId(userId: Int): List<Contact>
+    suspend fun findByUserId(userId: UUID): List<Contact>
 
     suspend fun findById(id: Int): Contact?
 
     suspend fun create(
-        userId: Int,
+        userId: UUID,
         name: String,
         company: String? = null,
         phoneNumber: String? = null,

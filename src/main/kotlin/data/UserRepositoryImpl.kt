@@ -4,7 +4,7 @@ import com.example.crm.models.User
 import com.example.crm.services.repositories.UserRepository
 import java.util.*
 
-class UserRepositoryImpl: UserRepository {
+class UserRepositoryImpl(): UserRepository {
     private val users = mutableListOf<User>()
 
     override suspend fun findAll(): List<User> = users

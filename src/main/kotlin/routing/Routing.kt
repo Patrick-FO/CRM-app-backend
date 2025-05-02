@@ -1,86 +1,28 @@
 package com.example.crm.routing
 
-import com.example.crm.models.User
+import com.example.crm.routing.request.ContactRequest
+import com.example.crm.routing.routeconfigs.*
+import com.example.crm.services.ContactService
 import com.example.crm.services.JwtService
 import com.example.crm.services.UserService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.util.*
 
 fun Application.configureRouting(
     userService: UserService,
-    jwtService: JwtService
+    jwtService: JwtService,
+    contactService: ContactService
 ) {
     val currentUser = "current-user"
     routing {
-        route("/api/auth") {
-            authRoute(jwtService)
-        }
-
-        route("/api/user") {
-            userRoute(userService)
-        }
-
-        authenticate {
-            get {
-                val users = userService.findAll()
-
-                call.respond(message = users.map(User::toResponse))
-            }
-
-            get("/{id}") {
-                val id: String = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.BadRequest)
-
-                val foundUser = userService.findById(id) ?: return@get call.respond(HttpStatusCode.NotFound)
-
-
-                if(foundUser.username != extractPrincipalUsername(call))
-                    return@get call.respond(HttpStatusCode.NotFound)
-
-                call.respond(
-                    message = foundUser.toResponse()
-                )
-            }
-        }
-
-        authenticate {
-            route("/users/{userId}") {
-                get("/contacts") {
-                    val userId = call.parameters["userId"]
-
-                    //TODO fetch all the contacts to view in a list later
-                }
-
-                post("/contacts") {
-                    val userId = call.parameters["userId"]
-
-                    //TODO create a contact
-                }
-
-                get("/contacts/{contactId}") {
-                    val userId = call.parameters["userId"]
-                    val contactId = call.parameters["contactId"]
-
-                    //TODO select one contact
-                }
-
-                get("/contacts/{contactId}/notes") {
-                    val userId = call.parameters["userId"]
-                    val contactId = call.parameters["contactId"]
-
-                    //TODO fetch all the contacts for one contact
-                }
-
-                get("/notes") {
-                    val userId = call.parameters["userId"]
-                }
-
-                post("/notes") {
-                    val userId = call.parameters["userId"]
-                }
-            }
-        }
+        authRoute(jwtService)
+        userRoute(userService)
+        contactRoute(contactService)
     }
 }
