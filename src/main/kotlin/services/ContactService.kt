@@ -55,7 +55,6 @@ class ContactService(private val contactRepository: ContactRepository) {
     }
 }
 
-// Extension function to convert Contact to ContactResponse
 fun Contact.toResponse() = ContactResponse(
     id = id,
     userId = userId,

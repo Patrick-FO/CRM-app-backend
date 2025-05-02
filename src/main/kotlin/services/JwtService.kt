@@ -34,6 +34,7 @@ class JwtService(
                 .withAudience(audience)
                 .withIssuer(issuer)
                 .withClaim("username", foundUser.username)
+                .withClaim("userId", foundUser.id.toString())
                 .withExpiresAt(Date(System.currentTimeMillis() + 3_600_000))
                 .sign(Algorithm.HMAC256(secret))
         } else null
@@ -41,13 +42,15 @@ class JwtService(
 
     fun customValidator(credential: JWTCredential): JWTPrincipal? {
         val username = extractUsername(credential)
-        val foundUser = username?.let { userService::findByUsername }
 
-        return foundUser?.let {
-            if(audienceMatches(credential)) {
-                JWTPrincipal(credential.payload)
-            } else null
+        //val foundUser = username?.let { userService::findByUsername }
+        val foundUser = username?.let {
+            kotlinx.coroutines.runBlocking { userService.findByUsername(it) }
         }
+
+        return if(foundUser != null && audienceMatches(credential)) {
+            JWTPrincipal(credential.payload)
+        } else null
     }
 
     private fun audienceMatches(credential: JWTCredential): Boolean =

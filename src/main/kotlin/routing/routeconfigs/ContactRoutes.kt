@@ -15,6 +15,7 @@ fun Route.contactRoute(contactService: ContactService) {
         authenticate {
             get {
                 val principal = call.principal<JWTPrincipal>()
+                //TODO Consider removing line below
                 val username = principal?.payload?.getClaim("username")?.asString()
                 val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
 
