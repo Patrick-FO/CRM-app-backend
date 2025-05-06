@@ -4,6 +4,7 @@ import com.example.crm.routing.request.ContactRequest
 import com.example.crm.routing.routeconfigs.*
 import com.example.crm.services.ContactService
 import com.example.crm.services.JwtService
+import com.example.crm.services.NoteService
 import com.example.crm.services.UserService
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -17,12 +18,13 @@ import java.util.*
 fun Application.configureRouting(
     userService: UserService,
     jwtService: JwtService,
-    contactService: ContactService
+    contactService: ContactService,
+    noteService: NoteService
 ) {
     val currentUser = "current-user"
     routing {
         authRoute(jwtService)
         userRoute(userService)
-        contactRoute(contactService)
+        contactRoute(contactService, noteService)
     }
 }

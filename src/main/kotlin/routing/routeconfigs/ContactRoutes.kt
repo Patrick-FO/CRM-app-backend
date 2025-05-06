@@ -2,6 +2,7 @@ package com.example.crm.routing.routeconfigs
 
 import com.example.crm.routing.request.ContactRequest
 import com.example.crm.services.ContactService
+import com.example.crm.services.NoteService
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
@@ -10,9 +11,11 @@ import io.ktor.server.routing.*
 import java.util.*
 import io.ktor.server.response.*
 
-fun Route.contactRoute(contactService: ContactService) {
+fun Route.contactRoute(contactService: ContactService, noteService: NoteService) {
     route("/api/users/{userId}/contacts") {
         authenticate {
+            noteRoutes(noteService)
+
             get {
                 val principal = call.principal<JWTPrincipal>()
                 //TODO Consider removing line below
@@ -48,6 +51,8 @@ fun Route.contactRoute(contactService: ContactService) {
             }
 
             route("/{contactId}") {
+                contactNotesRoute(noteService)
+
                 get {
                     val principal = call.principal<JWTPrincipal>()
                     val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
