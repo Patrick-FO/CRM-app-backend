@@ -23,7 +23,7 @@ fun Application.configureRouting(
 ) {
     val currentUser = "current-user"
     routing {
-        authRoute(jwtService)
+        authRoute(jwtService, userService)
         userRoute(userService)
         contactRoute(contactService, noteService)
     }
