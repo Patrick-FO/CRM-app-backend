@@ -18,7 +18,7 @@ interface ContactRepository {
 
     suspend fun update(
         id: Int,
-        name: String? = null,
+        name: String,
         company: String? = null,
         phoneNumber: String? = null,
         email: String? = null

@@ -1,10 +1,7 @@
 package com.example.crm.data
 
 import com.example.crm.models.Contact
-import com.example.crm.models.User
 import com.example.crm.services.repositories.ContactRepository
-import com.example.crm.utils.UUIDSerializer
-import kotlinx.serialization.Serializable
 import java.util.*
 
 class ContactRepositoryImpl(): ContactRepository {
@@ -38,21 +35,22 @@ class ContactRepositoryImpl(): ContactRepository {
         return contact
     }
 
+    // Fix: Update method that allows setting fields to null
     override suspend fun update(
         id: Int,
-        name: String?,
-        company: String?,
+        name: String,      // Name is required, so not nullable
+        company: String?,  // These can be set to null
         phoneNumber: String?,
         email: String?
     ): Boolean {
         val contact = contacts.find { it.id == id } ?: return false
 
-        // Update only the fields that are provided (non-null)
+        // Directly assign the values - null means "set to null"
         val updatedContact = contact.copy(
-            name = name ?: contact.name,
-            company = company ?: contact.company,
-            phoneNumber = phoneNumber ?: contact.phoneNumber,
-            contactEmail = email ?: contact.contactEmail
+            name = name,
+            company = company,
+            phoneNumber = phoneNumber,
+            contactEmail = email
         )
 
         val index = contacts.indexOfFirst { it.id == id }
@@ -66,5 +64,4 @@ class ContactRepositoryImpl(): ContactRepository {
     override suspend fun delete(id: Int): Boolean {
         return contacts.removeIf { it.id == id }
     }
-
 }
