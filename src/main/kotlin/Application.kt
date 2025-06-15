@@ -1,5 +1,6 @@
 package com.example.crm
 
+import com.example.crm.config.DatabaseConfig
 import com.example.crm.data.ContactRepositoryImpl
 import com.example.crm.data.NoteRepositoryImpl
 import com.example.crm.plugins.configureHTTP
@@ -22,6 +23,8 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
 
+    DatabaseConfig.init()
+
     val userRepository = UserRepositoryImpl()
     val userService = UserService(userRepository)
     val jwtService = JwtService(this, userService)
@@ -32,7 +35,6 @@ fun Application.module() {
 
     configureSecurity(jwtService)
     configureSerialization()
-    //configureDatabases()
     configureHTTP()
     configureRouting(userService, jwtService, contactService, noteService)
 }

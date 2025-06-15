@@ -1,24 +1,23 @@
 package com.example.crm.config
 
-import io.ktor.server.application.*
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.SchemaUtils
-import com.example.crm.models.Users
-import com.example.crm.models.Contacts
-import com.example.crm.models.Notes
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 
-fun Application.configureDatabases() {
-    // Connect to PostgreSQL directly
-    Database.connect(
-        url = "jdbc:postgresql://localhost:5432/crm_db",
-        driver = "org.postgresql.Driver",
-        user = "patrick",
-        password = "qwerty"
-    )
+object DatabaseConfig {
+    fun init() {
+        val config = HikariConfig().apply {
+            driverClassName = "org.postgresql.Driver"
+            jdbcUrl = "jdbc:postgresql://localhost:5432/crm_db"
+            username = "patrick"
+            password = "qwerty"
+            maximumPoolSize = 10
+            isAutoCommit = false
+            transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+            validate()
+        }
 
-    // Verify tables exist
-    transaction {
-        SchemaUtils.create(Users, Contacts, Notes)
+        val dataSource = HikariDataSource(config)
+        Database.connect(dataSource)
     }
 }

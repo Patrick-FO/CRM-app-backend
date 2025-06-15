@@ -33,7 +33,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
-    //implementation("com.zaxxer.hikari:HikariCP:5.0.0")
+    implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("org.postgresql:postgresql:42.5.4")
     implementation("com.h2database:h2:$h2_version")
     implementation("io.ktor:ktor-server-cors")

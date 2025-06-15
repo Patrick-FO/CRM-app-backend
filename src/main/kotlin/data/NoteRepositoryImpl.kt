@@ -1,57 +1,90 @@
 package com.example.crm.data
 
 import com.example.crm.models.Note
+import com.example.crm.database.Notes
 import com.example.crm.services.repositories.NoteRepository
+import com.example.crm.utils.toIntList
+import com.example.crm.utils.toJson
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.util.*
 
 
-class NoteRepositoryImpl: NoteRepository {
-    private val notes = mutableListOf<Note>()
-    private var nextId = 1
+class NoteRepositoryImpl : NoteRepository {
 
-    override suspend fun findByUserId(userId: UUID): List<Note> {
-        return notes.filter { it.userId == userId }
+    override suspend fun findByUserId(userId: UUID): List<Note> = transaction {
+        Notes.selectAll().where { Notes.userId eq userId }
+            .map { row ->
+                Note(
+                    id = row[Notes.id].value,
+                    userId = row[Notes.userId],
+                    title = row[Notes.title],
+                    description = row[Notes.description],
+                    contactIds = row[Notes.contactIds].toIntList()
+                )
+            }
     }
 
-    override suspend fun findByContact(userId: UUID, contactId: Int): List<Note> {
-        return notes.filter { it.userId == userId && it.contactIds.any { contactIdFromList -> contactIdFromList == contactId } }
+    override suspend fun findByContact(userId: UUID, contactId: Int): List<Note> = transaction {
+        Notes.selectAll().where { Notes.userId eq userId }
+            .map { row ->
+                Note(
+                    id = row[Notes.id].value,
+                    userId = row[Notes.userId],
+                    title = row[Notes.title],
+                    description = row[Notes.description],
+                    contactIds = row[Notes.contactIds].toIntList()
+                )
+            }
+            .filter { note -> note.contactIds.contains(contactId) }
     }
 
-    override suspend fun findById(id: Int): Note? {
-        return notes.find { it.id == id }
+    override suspend fun findById(id: Int): Note? = transaction {
+        Notes.selectAll().where { Notes.id eq id }
+            .map { row ->
+                Note(
+                    id = row[Notes.id].value,
+                    userId = row[Notes.userId],
+                    title = row[Notes.title],
+                    description = row[Notes.description],
+                    contactIds = row[Notes.contactIds].toIntList()
+                )
+            }
+            .singleOrNull()
     }
 
-    override suspend fun create(userId: UUID, title: String, description: String?, contactIds: List<Int>): Note {
-        val note = Note(
-            id = nextId++,
+    override suspend fun create(userId: UUID, title: String, description: String?, contactIds: List<Int>): Note = transaction {
+        val insertedId = Notes.insert {
+            it[Notes.userId] = userId
+            it[Notes.title] = title
+            it[Notes.description] = description
+            it[Notes.contactIds] = contactIds.toJson()
+        } get Notes.id
+
+        Note(
+            id = insertedId.value,
             userId = userId,
-            contactIds = contactIds,
-            title = title,
-            description = description,
-        )
-        notes.add(note)
-        return note
-    }
-
-    override suspend fun update(id: Int, title: String, description: String, contactIds: List<Int>): Boolean {
-        var note = notes.find { it.id == id } ?: return false
-
-        note = note.copy(
             title = title,
             description = description,
             contactIds = contactIds
         )
+    }
 
-        val index = notes.indexOfFirst { it.id == id }
-        if (index != -1) {
-            notes[index] = note
-            return true
+    override suspend fun update(id: Int, title: String, description: String, contactIds: List<Int>): Boolean = transaction {
+        val updatedRows = Notes.update({ Notes.id eq id }) {
+            it[Notes.title] = title
+            it[Notes.description] = description
+            it[Notes.contactIds] = contactIds.toJson()
         }
-        return false
+        updatedRows > 0
     }
 
-    override suspend fun delete(id: Int): Boolean {
-        return notes.removeIf { it.id == id }
+    override suspend fun delete(id: Int): Boolean = transaction {
+        val deletedRows = Notes.deleteWhere { Notes.id eq id }
+        deletedRows > 0
     }
-
 }
