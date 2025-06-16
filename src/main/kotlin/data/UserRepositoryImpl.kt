@@ -3,7 +3,6 @@ package com.example.crm.data
 import com.example.crm.models.User
 import com.example.crm.database.Users
 import com.example.crm.services.repositories.UserRepository
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*

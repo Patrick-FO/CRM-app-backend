@@ -24,7 +24,7 @@ class NoteRepositoryImpl : NoteRepository {
                     userId = row[Notes.userId],
                     title = row[Notes.title],
                     description = row[Notes.description],
-                    contactIds = row[Notes.contactIds].toIntList()
+                    contactIds = row[Notes.contactIds]
                 )
             }
     }
@@ -37,7 +37,7 @@ class NoteRepositoryImpl : NoteRepository {
                     userId = row[Notes.userId],
                     title = row[Notes.title],
                     description = row[Notes.description],
-                    contactIds = row[Notes.contactIds].toIntList()
+                    contactIds = row[Notes.contactIds]
                 )
             }
             .filter { note -> note.contactIds.contains(contactId) }
@@ -51,7 +51,7 @@ class NoteRepositoryImpl : NoteRepository {
                     userId = row[Notes.userId],
                     title = row[Notes.title],
                     description = row[Notes.description],
-                    contactIds = row[Notes.contactIds].toIntList()
+                    contactIds = row[Notes.contactIds]
                 )
             }
             .singleOrNull()
@@ -62,7 +62,7 @@ class NoteRepositoryImpl : NoteRepository {
             it[Notes.userId] = userId
             it[Notes.title] = title
             it[Notes.description] = description
-            it[Notes.contactIds] = contactIds.toJson()
+            it[Notes.contactIds] = contactIds
         } get Notes.id
 
         Note(
@@ -78,7 +78,7 @@ class NoteRepositoryImpl : NoteRepository {
         val updatedRows = Notes.update({ Notes.id eq id }) {
             it[Notes.title] = title
             it[Notes.description] = description
-            it[Notes.contactIds] = contactIds.toJson()
+            it[Notes.contactIds] = contactIds
         }
         updatedRows > 0
     }

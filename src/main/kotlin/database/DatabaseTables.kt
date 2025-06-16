@@ -1,7 +1,11 @@
 package com.example.crm.database
 
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.json.json
 
 object Users : Table("users") {
     val id = uuid("id")
@@ -23,5 +27,9 @@ object Notes : IntIdTable("notes") {
     val userId = reference("user_id", Users.id)
     val title = varchar("title", 255)
     val description = text("description").nullable()
-    val contactIds = text("contact_ids")
+    val contactIds = json<List<Int>>(
+        "contact_ids",
+        Json.Default,
+        ListSerializer(Int.serializer())
+    )
 }
