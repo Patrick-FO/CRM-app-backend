@@ -1,0 +1,613 @@
+openapi: 3.0.3
+info:
+  title: Simple CRM API
+  description: A basic CRM API for managing contacts and notes with simple authentication
+  version: 1.0.0
+  contact:
+    name: CRM API Support
+    email: support@example.com
+
+servers:
+  - url: http://localhost:8080
+    description: Development server
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authentication
+
+  schemas:
+    # Authentication schemas
+    LoginRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: "example_username"
+        password:
+          type: string
+          format: password
+          example: "password123"
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    # User schemas
+    UserRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: "example_username"
+        password:
+          type: string
+          format: password
+          example: "password123"
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        username:
+          type: string
+          example: "example_username"
+
+    # Contact schemas
+    ContactRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "MF Doom"
+        company:
+          type: string
+          example: "Record label"
+        phoneNumber:
+          type: string
+          example: "+46700000000"
+        contactEmail:
+          type: string
+          format: email
+          example: "mf.doom@recordlabel.com"
+
+    ContactResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        userId:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          example: "MF Doom"
+        company:
+          type: string
+          example: "Record Label"
+        phoneNumber:
+          type: string
+          example: "+467000000000"
+        contactEmail:
+          type: string
+          format: email
+          example: "mf.doom@recordlabel.com"
+
+    # Note schemas
+    NoteRequest:
+      type: object
+      required:
+        - contactIds
+        - title
+        - description
+      properties:
+        contactIds:
+          type: array
+          items:
+            type: integer
+          example: [1, 2]
+        title:
+          type: string
+          example: "Meeting Notes"
+        description:
+          type: string
+          example: "Had a great meeting about the project"
+
+    NoteResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        userId:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        contactIds:
+          type: array
+          items:
+            type: integer
+          example: [1, 2]
+        title:
+          type: string
+          example: "Meeting Notes"
+        description:
+          type: string
+          example: "Had a great meeting about the project"
+
+    # Error schema
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Error description"
+
+paths:
+  # Authentication endpoints
+  /api/auth:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      description: Authenticate user and get JWT token
+      security: []  # No auth required for login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              example1:
+                summary: Example login
+                value:
+                  username: "example_username"
+                  password: "password123"
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            userId:
+              description: User ID of authenticated user
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid credentials
+
+  # User endpoints
+  /api/user:
+    post:
+      tags:
+        - Users
+      summary: Register new user
+      description: Create a new user account
+      security: []  # No auth required for registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '201':
+          description: User created successfully
+          headers:
+            id:
+              description: ID of created user
+              schema:
+                type: string
+        '400':
+          description: Invalid user data
+
+    get:
+      tags:
+        - Users
+      summary: Get all users
+      description: Get all users (authenticated users only)
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Authentication required
+
+  /api/user/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      description: Get user by ID (users can only access their own profile)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID (UUID)
+          schema:
+            type: string
+            format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Invalid user ID format
+        '401':
+          description: Authentication required
+        '404':
+          description: User not found or access denied
+
+  # Contact endpoints
+  /api/users/{userId}/contacts:
+    get:
+      tags:
+        - Contacts
+      summary: Get all contacts for user
+      description: Get all contacts for a specific user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User ID (UUID)
+          schema:
+            type: string
+            format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: List of user's contacts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContactResponse'
+        '400':
+          description: Invalid user ID format
+        '401':
+          description: Authentication required
+        '403':
+          description: Access denied - can only view own contacts
+
+    post:
+      tags:
+        - Contacts
+      summary: Create new contact
+      description: Create a new contact for a user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactRequest'
+      responses:
+        '201':
+          description: Contact created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
+        '400':
+          description: Invalid user ID or contact data
+        '401':
+          description: Authentication required
+        '403':
+          description: Access denied
+
+  /api/users/{userId}/contacts/{contactId}:
+    get:
+      tags:
+        - Contacts
+      summary: Get specific contact
+      description: Get a specific contact by ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Contact details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
+        '400':
+          description: Invalid ID format
+        '401':
+          description: Authentication required
+        '403':
+          description: Access denied
+        '404':
+          description: Contact not found
+
+    put:
+      tags:
+        - Contacts
+      summary: Update contact
+      description: Update an existing contact
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactRequest'
+      responses:
+        '200':
+          description: Contact updated successfully
+        '400':
+          description: Invalid data
+        '401':
+          description: Authentication required
+        '403':
+          description: Access denied
+        '404':
+          description: Contact not found
+
+    delete:
+      tags:
+        - Contacts
+      summary: Delete contact
+      description: Delete a contact
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Contact deleted successfully
+        '400':
+          description: Invalid ID format
+        '401':
+          description: Authentication required
+        '403':
+          description: Access denied
+        '404':
+          description: Contact not found
+
+  # Note endpoints
+  /api/users/{userId}/contacts/notes:
+    post:
+      tags:
+        - Notes
+      summary: Create note
+      description: Create a new note for a user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteRequest'
+      responses:
+        '201':
+          description: Note created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteResponse'
+        '400':
+          description: Invalid data
+        '401':
+          description: Authentication required
+        '403':
+          description: Access denied
+
+  /api/users/{userId}/contacts/notes/{noteId}:
+    get:
+      tags:
+        - Notes
+      summary: Get specific note
+      description: Get a specific note by ID
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: noteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Note details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteResponse'
+        '400':
+          description: Invalid ID format
+        '401':
+          description: Authentication required
+        '403':
+          description: Access denied
+        '404':
+          description: Note not found
+
+    put:
+      tags:
+        - Notes
+      summary: Update note
+      description: Update an existing note
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: noteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteRequest'
+      responses:
+        '200':
+          description: Note updated successfully
+        '400':
+          description: Invalid data
+        '401':
+          description: Authentication required
+        '403':
+          description: Access denied
+        '404':
+          description: Note not found
+
+    delete:
+      tags:
+        - Notes
+      summary: Delete note
+      description: Delete a note
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: noteId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Note deleted successfully
+        '400':
+          description: Invalid ID format
+        '401':
+          description: Authentication required
+        '403':
+          description: Access denied
+        '404':
+          description: Note not found
+
+  /api/users/{userId}/contacts/{contactId}/notes:
+    get:
+      tags:
+        - Notes
+      summary: Get notes for contact
+      description: Get all notes for a specific contact
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: contactId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of notes for the contact
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NoteResponse'
+        '400':
+          description: Invalid ID format
+        '401':
+          description: Authentication required
+        '403':
+          description: Access denied
+
+tags:
+  - name: Authentication
+    description: User authentication and registration
+  - name: Users
+    description: User management operations
+  - name: Contacts
+    description: Contact management operations
+  - name: Notes
+    description: Note management operations

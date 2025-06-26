@@ -10,6 +10,9 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
+import io.ktor.server.http.content.resources
+import io.ktor.server.http.content.static
+import io.ktor.server.http.content.staticResources
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -26,5 +29,6 @@ fun Application.configureRouting(
         authRoute(jwtService, userService)
         userRoute(userService)
         contactRoute(contactService, noteService)
+        staticResources("/docs", "docs")
     }
 }
