@@ -9,11 +9,19 @@ fun Application.configureSecurity(
     jwtService: JwtService
 ) {
     authentication {
-        jwt {
+        jwt("user") {
             realm = jwtService.realm
             verifier(jwtService.jwtVerifier)
             validate { credential ->
                 jwtService.customValidator(credential)
+            }
+        }
+
+        jwt("admin") {
+            realm = jwtService.realm
+            verifier(jwtService.jwtVerifier)
+            validate { credential ->
+                jwtService.adminValidator(credential)
             }
         }
     }

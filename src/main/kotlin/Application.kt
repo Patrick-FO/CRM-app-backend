@@ -37,4 +37,5 @@ fun Application.module() {
     configureSerialization()
     configureHTTP()
     configureRouting(userService, jwtService, contactService, noteService)
+    println(jwtService.createAdminToken())
 }

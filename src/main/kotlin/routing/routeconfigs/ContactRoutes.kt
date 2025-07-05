@@ -13,7 +13,7 @@ import io.ktor.server.response.*
 
 fun Route.contactRoute(contactService: ContactService, noteService: NoteService) {
     route("/api/users/{userId}/contacts") {
-        authenticate {
+        authenticate("user", "admin") {
             noteRoutes(noteService)
 
             get {

@@ -29,7 +29,7 @@ fun Route.userRoute(userService: UserService) {
             call.respond(message = HttpStatusCode.Created)
         }
 
-        authenticate {
+        authenticate("admin") {
             get {
                 val users = userService.findAll()
 

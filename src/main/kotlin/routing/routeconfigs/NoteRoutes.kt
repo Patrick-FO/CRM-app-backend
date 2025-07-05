@@ -12,6 +12,21 @@ import java.util.*
 
 fun Route.noteRoutes(noteService: NoteService) {
     route("/notes") {
+        get {
+            val principal = call.principal<JWTPrincipal>()
+            val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
+
+            val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
+                ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
+
+            if(authenticatedUserId != userId.toString()) {
+                return@get call.respond(HttpStatusCode.Forbidden, "You can only access your own notes")
+            }
+
+            val notes = noteService.findByUserId(userId)
+            call.respond(HttpStatusCode.Found, notes)
+        }
+
         post {
             val principal = call.principal<JWTPrincipal>()
             val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
@@ -20,7 +35,7 @@ fun Route.noteRoutes(noteService: NoteService) {
                 ?: return@post call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
 
             if (authenticatedUserId != userId.toString()) {
-                return@post call.respond(HttpStatusCode.Forbidden, "You can only access your own notes")
+                return@post call.respond(HttpStatusCode.Forbidden, "You can only create notes for yourself")
             }
 
             val request = call.receive<NoteRequest>()

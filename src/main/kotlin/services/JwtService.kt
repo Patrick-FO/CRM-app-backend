@@ -40,6 +40,18 @@ class JwtService(
         } else null
     }
 
+    fun createAdminToken(): String {
+        return JWT
+            .create()
+            .withAudience(audience)
+            .withIssuer(issuer)
+            .withClaim("username", "admin-cli")
+            .withClaim("userId", "00000000-0000-0000-0000-000000000000")
+            .withClaim("role", "admin")
+            .withExpiresAt(Date(System.currentTimeMillis() + 365L * 24 * 60 * 60 * 1000)) // 1 year
+            .sign(Algorithm.HMAC256(secret))
+    }
+
     fun customValidator(credential: JWTCredential): JWTPrincipal? {
         val username = extractUsername(credential)
 
@@ -49,6 +61,15 @@ class JwtService(
         }
 
         return if(foundUser != null && audienceMatches(credential)) {
+            JWTPrincipal(credential.payload)
+        } else null
+    }
+
+    fun adminValidator(credential: JWTCredential): JWTPrincipal? {
+        val role = credential.payload.getClaim("role")?.asString()
+        val username = extractUsername(credential)
+
+        return if(role == "admin" && username == "admin-cli" && audienceMatches(credential)) {
             JWTPrincipal(credential.payload)
         } else null
     }
