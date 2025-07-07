@@ -15,26 +15,28 @@ fun Route.noteRoutes(noteService: NoteService) {
         get {
             val principal = call.principal<JWTPrincipal>()
             val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
+            val role = principal?.payload?.getClaim("role")?.asString()
 
             val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
 
-            if(authenticatedUserId != userId.toString()) {
+            if(role != "admin" && authenticatedUserId != userId.toString()) {
                 return@get call.respond(HttpStatusCode.Forbidden, "You can only access your own notes")
             }
 
             val notes = noteService.findByUserId(userId)
-            call.respond(HttpStatusCode.Found, notes)
+            call.respond(HttpStatusCode.OK, notes)
         }
 
         post {
             val principal = call.principal<JWTPrincipal>()
             val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
+            val role = principal?.payload?.getClaim("role")?.asString()
 
             val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
                 ?: return@post call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
 
-            if (authenticatedUserId != userId.toString()) {
+            if (role != "admin" && authenticatedUserId != userId.toString()) {
                 return@post call.respond(HttpStatusCode.Forbidden, "You can only create notes for yourself")
             }
 
@@ -50,6 +52,7 @@ fun Route.noteRoutes(noteService: NoteService) {
 
                 val principal = call.principal<JWTPrincipal>()
                 val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
+                val role = principal?.payload?.getClaim("role")?.asString()
 
                 val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
                     ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
@@ -57,7 +60,7 @@ fun Route.noteRoutes(noteService: NoteService) {
                 val noteId = call.parameters["noteId"]?.toIntOrNull()
                     ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid note ID")
 
-                if (authenticatedUserId != userId.toString()) {
+                if (role != "admin" && authenticatedUserId != userId.toString()) {
                     return@get call.respond(HttpStatusCode.Forbidden, "You can only access your own notes")
                 }
 
@@ -70,6 +73,7 @@ fun Route.noteRoutes(noteService: NoteService) {
             put {
                 val principal = call.principal<JWTPrincipal>()
                 val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
+                val role = principal?.payload?.getClaim("role")?.asString()
 
                 val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
                     ?: return@put call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
@@ -77,7 +81,7 @@ fun Route.noteRoutes(noteService: NoteService) {
                 val noteId = call.parameters["noteId"]?.toIntOrNull()
                     ?: return@put call.respond(HttpStatusCode.BadRequest, "Invalid note ID")
 
-                if (authenticatedUserId != userId.toString()) {
+                if (role != "admin" && authenticatedUserId != userId.toString()) {
                     return@put call.respond(HttpStatusCode.Forbidden, "You can only access your own notes")
                 }
 
@@ -97,6 +101,7 @@ fun Route.noteRoutes(noteService: NoteService) {
             delete {
                 val principal = call.principal<JWTPrincipal>()
                 val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
+                val role = principal?.payload?.getClaim("role")?.asString()
 
                 val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
                     ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
@@ -104,7 +109,7 @@ fun Route.noteRoutes(noteService: NoteService) {
                 val noteId = call.parameters["noteId"]?.toIntOrNull()
                     ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid note ID")
 
-                if (authenticatedUserId != userId.toString()) {
+                if (role != "admin" && authenticatedUserId != userId.toString()) {
                     return@delete call.respond(HttpStatusCode.Forbidden, "You can only access your own notes")
                 }
 
@@ -125,6 +130,7 @@ fun Route.contactNotesRoute(noteService: NoteService) {
         get {
             val principal = call.principal<JWTPrincipal>()
             val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
+            val role = principal?.payload?.getClaim("role")?.asString()
 
             val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
@@ -132,7 +138,7 @@ fun Route.contactNotesRoute(noteService: NoteService) {
             val contactId = call.parameters["contactId"]?.toIntOrNull()
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid contact ID")
 
-            if (authenticatedUserId != userId.toString()) {
+            if (role != "admin" && authenticatedUserId != userId.toString()) {
                 return@get call.respond(HttpStatusCode.Forbidden, "You can only access your own notes")
             }
 

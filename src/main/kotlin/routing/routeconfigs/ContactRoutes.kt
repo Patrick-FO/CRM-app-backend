@@ -21,12 +21,13 @@ fun Route.contactRoute(contactService: ContactService, noteService: NoteService)
                 //TODO Consider removing line below
                 val username = principal?.payload?.getClaim("username")?.asString()
                 val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
+                val role = principal?.payload?.getClaim("role")?.asString()
 
                 val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
                     ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
 
                 // Check if the authenticated user is accessing their own contacts
-                if (authenticatedUserId != userId.toString()) {
+                if (role != "admin" && authenticatedUserId != userId.toString()) {
                     return@get call.respond(HttpStatusCode.Forbidden, "You can only access your own contacts")
                 }
 
@@ -37,11 +38,12 @@ fun Route.contactRoute(contactService: ContactService, noteService: NoteService)
             post {
                 val principal = call.principal<JWTPrincipal>()
                 val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
+                val role = principal?.payload?.getClaim("role")?.asString()
 
                 val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
                     ?: return@post call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
 
-                if (authenticatedUserId != userId.toString()) {
+                if (role != "admin" && authenticatedUserId != userId.toString()) {
                     return@post call.respond(HttpStatusCode.Forbidden, "You can only create contacts for yourself")
                 }
 
@@ -56,6 +58,7 @@ fun Route.contactRoute(contactService: ContactService, noteService: NoteService)
                 get {
                     val principal = call.principal<JWTPrincipal>()
                     val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
+                    val role = principal?.payload?.getClaim("role")?.asString()
 
                     val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
                         ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
@@ -63,7 +66,7 @@ fun Route.contactRoute(contactService: ContactService, noteService: NoteService)
                     val contactId = call.parameters["contactId"]?.toIntOrNull()
                         ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid contact ID")
 
-                    if (authenticatedUserId != userId.toString()) {
+                    if (role != "admin" && authenticatedUserId != userId.toString()) {
                         return@get call.respond(HttpStatusCode.Forbidden, "You can only access your own contacts")
                     }
 
@@ -76,6 +79,7 @@ fun Route.contactRoute(contactService: ContactService, noteService: NoteService)
                 put {
                     val principal = call.principal<JWTPrincipal>()
                     val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
+                    val role = principal?.payload?.getClaim("role")?.asString()
 
                     val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
                         ?: return@put call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
@@ -83,7 +87,7 @@ fun Route.contactRoute(contactService: ContactService, noteService: NoteService)
                     val contactId = call.parameters["contactId"]?.toIntOrNull()
                         ?: return@put call.respond(HttpStatusCode.BadRequest, "Invalid contact ID")
 
-                    if (authenticatedUserId != userId.toString()) {
+                    if (role != "admin" && authenticatedUserId != userId.toString()) {
                         return@put call.respond(HttpStatusCode.Forbidden, "You can only update your own contacts")
                     }
 
@@ -100,6 +104,7 @@ fun Route.contactRoute(contactService: ContactService, noteService: NoteService)
                 delete {
                     val principal = call.principal<JWTPrincipal>()
                     val authenticatedUserId = principal?.payload?.getClaim("userId")?.asString()
+                    val role = principal?.payload?.getClaim("role")?.asString()
 
                     val userId = call.parameters["userId"]?.let { UUID.fromString(it) }
                         ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid user ID")
@@ -107,7 +112,7 @@ fun Route.contactRoute(contactService: ContactService, noteService: NoteService)
                     val contactId = call.parameters["contactId"]?.toIntOrNull()
                         ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid contact ID")
 
-                    if (authenticatedUserId != userId.toString()) {
+                    if (role != "admin" && authenticatedUserId != userId.toString()) {
                         return@delete call.respond(HttpStatusCode.Forbidden, "You can only delete your own contacts")
                     }
 
