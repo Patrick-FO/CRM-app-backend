@@ -37,5 +37,6 @@ fun Application.module() {
     configureSerialization()
     configureHTTP()
     configureRouting(userService, jwtService, contactService, noteService)
+    //TODO Remove in production, sensitive token for CLI admin tool
     println(jwtService.createAdminToken())
 }
