@@ -7,6 +7,7 @@ import com.example.crm.routing.request.LoginRequest
 import io.ktor.server.application.*
 import io.ktor.server.auth.jwt.*
 import kotlinx.coroutines.coroutineScope
+import org.mindrot.jbcrypt.BCrypt
 import java.util.*
 
 class JwtService(
@@ -28,7 +29,7 @@ class JwtService(
     suspend fun createJwtToken(loginRequest: LoginRequest): String? {
         val foundUser = userService.findByUsername(loginRequest.username)
 
-        return if(foundUser != null && foundUser.password == loginRequest.password) {
+        return if(foundUser != null && checkPassword(loginRequest.password, foundUser.password)) {
             JWT
                 .create()
                 .withAudience(audience)
@@ -83,4 +84,7 @@ class JwtService(
 
     private fun getConfigProperty(path: String) =
         application.environment.config.property(path).getString()
+
+    private fun checkPassword(password: String, hashed: String): Boolean =
+        BCrypt.checkpw(password, hashed)
 }
