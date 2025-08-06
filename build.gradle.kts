@@ -24,6 +24,9 @@ repositories {
 }
 
 dependencies {
+    implementation("io.insert-koin:koin-core:4.1.0")
+    implementation("io.insert-koin:koin-ktor:4.1.0")
+    implementation("io.insert-koin:koin-logger-slf4j:4.1.0")
     implementation("io.ktor:ktor-server-core")
     implementation("io.ktor:ktor-server-auth")
     implementation("io.ktor:ktor-server-auth-jwt")

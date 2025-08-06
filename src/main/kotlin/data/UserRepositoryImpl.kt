@@ -7,9 +7,9 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
-class UserRepositoryImpl : UserRepository {
+class UserRepositoryImpl(private val database: Database) : UserRepository {
 
-    override suspend fun findAll(): List<User> = transaction {
+    override suspend fun findAll(): List<User> = transaction(database) {
         Users.selectAll().map { row ->
             User(
                 id = row[Users.id],
@@ -19,7 +19,7 @@ class UserRepositoryImpl : UserRepository {
         }
     }
 
-    override suspend fun findById(id: UUID): User? = transaction {
+    override suspend fun findById(id: UUID): User? = transaction(database) {
         Users.selectAll().where { Users.id eq id }
             .map { row ->
                 User(
@@ -31,7 +31,7 @@ class UserRepositoryImpl : UserRepository {
             .singleOrNull()
     }
 
-    override suspend fun findByUsername(username: String): User? = transaction {
+    override suspend fun findByUsername(username: String): User? = transaction(database) {
         Users.selectAll().where { Users.username eq username }
             .map { row ->
                 User(
@@ -43,7 +43,7 @@ class UserRepositoryImpl : UserRepository {
             .singleOrNull()
     }
 
-    override suspend fun save(user: User): Boolean = transaction {
+    override suspend fun save(user: User): Boolean = transaction(database) {
         try {
             Users.insert {
                 it[Users.id] = user.id

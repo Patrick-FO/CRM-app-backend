@@ -4,10 +4,11 @@ import com.example.crm.services.JwtService
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
+import org.koin.ktor.ext.inject
 
-fun Application.configureSecurity(
-    jwtService: JwtService
-) {
+fun Application.configureSecurity() {
+    val jwtService by inject<JwtService>()
+
     authentication {
         jwt("user") {
             realm = jwtService.realm

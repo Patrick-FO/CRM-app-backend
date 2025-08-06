@@ -3,8 +3,6 @@ package com.example.crm.data
 import com.example.crm.models.Note
 import com.example.crm.database.Notes
 import com.example.crm.services.repositories.NoteRepository
-import com.example.crm.utils.toIntList
-import com.example.crm.utils.toJson
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert

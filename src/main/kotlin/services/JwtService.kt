@@ -6,7 +6,6 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.example.crm.routing.request.LoginRequest
 import io.ktor.server.application.*
 import io.ktor.server.auth.jwt.*
-import kotlinx.coroutines.coroutineScope
 import org.mindrot.jbcrypt.BCrypt
 import java.util.*
 

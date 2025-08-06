@@ -1,21 +1,17 @@
 package com.example.crm
 
-import com.example.crm.config.DatabaseConfig
-import com.example.crm.data.ContactRepositoryImpl
-import com.example.crm.data.NoteRepositoryImpl
 import com.example.crm.plugins.configureHTTP
 import com.example.crm.plugins.configureSecurity
 import com.example.crm.plugins.configureSerialization
-import com.example.crm.data.UserRepositoryImpl
-import com.example.crm.models.Contact
-import com.example.crm.models.User
+import com.example.crm.di.appModule
+import com.example.crm.di.controllerModule
+import com.example.crm.di.databaseModule
+import com.example.crm.di.repositoryModule
+import com.example.crm.di.serviceModule
 import com.example.crm.routing.configureRouting
-import com.example.crm.services.ContactService
-import com.example.crm.services.JwtService
-import com.example.crm.services.NoteService
-import com.example.crm.services.UserService
 import io.ktor.server.application.*
-import java.util.*
+import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
@@ -23,20 +19,23 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
 
-    DatabaseConfig.init()
+    install(Koin) {
+        slf4jLogger()
+        modules(
+            appModule(this@module),
+            databaseModule,
+            repositoryModule,
+            serviceModule,
+            controllerModule,
+        )
+    }
 
-    val userRepository = UserRepositoryImpl()
-    val userService = UserService(userRepository)
-    val jwtService = JwtService(this, userService)
-    val contactRepository = ContactRepositoryImpl()
-    val contactService = ContactService(contactRepository)
-    val noteRepository = NoteRepositoryImpl()
-    val noteService = NoteService(noteRepository, contactRepository)
-
-    configureSecurity(jwtService)
+    configureSecurity()
     configureSerialization()
     configureHTTP()
-    configureRouting(userService, jwtService, contactService, noteService)
+    configureRouting()
     //TODO Remove in production, sensitive token for CLI admin tool
-    println(jwtService.createAdminToken())
+    //val jwtService by inject<JwtService>()
+    //println(jwtService.createAdminToken())
 }
+

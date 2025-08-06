@@ -11,3 +11,11 @@ jwt:
   issuer: "http://localhost"
   realm: "my realm"
   secret: SECRET
+
+database:
+  driver: "org.postgresql.Driver"
+  url: "jdbc:postgresql://localhost:5432/crm_db"
+  user: "patrick"
+  password: "qwerty"
+  maxPoolSize: 10
+  minIdle: 5
