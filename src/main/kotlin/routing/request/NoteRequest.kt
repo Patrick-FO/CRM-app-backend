@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class NoteRequest(
     val contactIds: List<Int>,
     val title: String,
-    val description: String
+    val description: String?
 )

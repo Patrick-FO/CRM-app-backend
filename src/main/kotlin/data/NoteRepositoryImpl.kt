@@ -72,7 +72,7 @@ class NoteRepositoryImpl : NoteRepository {
         )
     }
 
-    override suspend fun update(id: Int, title: String, description: String, contactIds: List<Int>): Boolean = transaction {
+    override suspend fun update(id: Int, title: String, description: String?, contactIds: List<Int>): Boolean = transaction {
         val updatedRows = Notes.update({ Notes.id eq id }) {
             it[Notes.title] = title
             it[Notes.description] = description

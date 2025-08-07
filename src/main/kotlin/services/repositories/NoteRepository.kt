@@ -21,7 +21,7 @@ interface NoteRepository {
     suspend fun update(
         id: Int,
         title: String,
-        description: String,
+        description: String?,
         contactIds: List<Int>
     ): Boolean
 
