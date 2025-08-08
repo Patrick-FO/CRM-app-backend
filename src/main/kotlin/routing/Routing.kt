@@ -6,7 +6,6 @@ import io.ktor.server.http.content.staticResources
 import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
-    val currentUser = "current-user"
     routing {
         authRoute()
         userRoute()
