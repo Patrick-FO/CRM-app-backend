@@ -1,0 +1,20 @@
+ktor:
+  application:
+    modules:
+      - "com.example.crm.ApplicationKt.module"
+  deployment:
+    port: 8080
+
+jwt:
+  audience: "test-audience"
+  issuer: "test-issuer"
+  realm: "test-realm"
+  secret: "test-secret-key-for-testing-only"
+
+database:
+  driver: "org.h2.Driver"
+  url: "jdbc:h2:mem:test_db;DB_CLOSE_DELAY=-1"
+  user: "sa"
+  password: ""
+  maxPoolSize: 5
+  minIdle: 2

@@ -1,6 +1,7 @@
 val exposed_version: String by project
 val h2_version: String by project
 val kotlin_version: String by project
+val ktor_version: String by project
 val logback_version: String by project
 
 plugins {
@@ -24,15 +25,25 @@ repositories {
 }
 
 dependencies {
+    // Koin DI
     implementation("io.insert-koin:koin-core:4.1.0")
     implementation("io.insert-koin:koin-ktor:4.1.0")
     implementation("io.insert-koin:koin-logger-slf4j:4.1.0")
-    implementation("io.ktor:ktor-server-core")
-    implementation("io.ktor:ktor-server-auth")
-    implementation("io.ktor:ktor-server-auth-jwt")
+
+    // Ktor server
+    implementation("io.ktor:ktor-server-core:$ktor_version")
+    implementation("io.ktor:ktor-server-auth:$ktor_version")
+    implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-server-cors:$ktor_version")
+    implementation("io.ktor:ktor-server-netty:$ktor_version")
+    implementation("io.ktor:ktor-server-config-yaml:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+
+    // Password hashing
     implementation("org.mindrot:jbcrypt:0.4")
-    implementation("io.ktor:ktor-server-content-negotiation")
-    implementation("io.ktor:ktor-serialization-kotlinx-json")
+
+    // Database
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
@@ -41,15 +52,32 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("org.postgresql:postgresql:42.5.4")
     implementation("com.h2database:h2:$h2_version")
-    implementation("io.ktor:ktor-server-cors")
-    implementation("io.ktor:ktor-server-netty")
+
+    // Logging
     implementation("ch.qos.logback:logback-classic:$logback_version")
-    implementation("io.ktor:ktor-server-config-yaml")
-    testImplementation("io.ktor:ktor-server-test-host")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
-    testImplementation("io.ktor:ktor-server-tests:2.3.7")
-    testImplementation("io.ktor:ktor-client-content-negotiation:2.3.7")
-    testImplementation("io.ktor:ktor-client-auth:2.3.7")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.10")
+
+    // Testing - Use consistent versions
+    testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
+    testImplementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    testImplementation("io.ktor:ktor-client-auth:$ktor_version")
+
+    // JUnit 5 (choose one test framework)
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+
+    // Kotlin test
+    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
+
+    // Mockk for mocking
+    testImplementation("io.mockk:mockk:1.13.4")
+
+    // H2 for testing
+    testImplementation("com.h2database:h2:$h2_version")
+
+    // Koin testing
+    testImplementation("io.insert-koin:koin-test:4.1.0")
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
